@@ -4,20 +4,6 @@ from openroad import Tech, Design, Timing
 import openroad as ord
 import csv
 
-#to confirm metrics of the design
-# def print_benchmark_statistics(design_name, design):
-#     timing = Timing(design)
-#     block = ord.get_db_block()
-#     corner = timing.getCorners()[0]
-#     gate_count = sum(1 for inst in block.getInsts() if not inst.getMaster().isBlock() and not inst.getMaster().isFiller())
-
-#     print("\nBenchmark Statistics [Post global route metrics]")
-#     print("-------------------------------------------------")
-#     print(f"Design: {design_name}")
-#     print(f"Gate count: {gate_count}")
-#     print("-------------------------------------------------")
-
-
 #this is not the same as openroad helpers it uses the odb to load the design
 def load_design_odb(odb_path, sdc_path, lib_dir, lef_dir):
     tech = Tech()
@@ -189,7 +175,6 @@ if __name__ == "__main__":
     LEF_PATH = f"../../platform/{args.platform}/lef"
 
     tech, design = load_design_odb(ODB_PATH, SDC_PATH, LIB_PATH, LEF_PATH)
-    # print_benchmark_statistics(args.design, design)
     cells, pins, nets = extract_design_data(design)
 
     write_csv(cells, "../../designs/{args.design}/IR_Tables/cells.csv")
