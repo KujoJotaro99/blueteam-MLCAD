@@ -5,17 +5,17 @@ import openroad as ord
 import csv
 
 #to confirm metrics of the design
-def print_benchmark_statistics(design_name, design):
-    timing = Timing(design)
-    block = ord.get_db_block()
-    corner = timing.getCorners()[0]
-    gate_count = sum(1 for inst in block.getInsts() if not inst.getMaster().isBlock() and not inst.getMaster().isFiller())
+# def print_benchmark_statistics(design_name, design):
+#     timing = Timing(design)
+#     block = ord.get_db_block()
+#     corner = timing.getCorners()[0]
+#     gate_count = sum(1 for inst in block.getInsts() if not inst.getMaster().isBlock() and not inst.getMaster().isFiller())
 
-    print("\nBenchmark Statistics [Post global route metrics]")
-    print("-------------------------------------------------")
-    print(f"Design: {design_name}")
-    print(f"Gate count: {gate_count}")
-    print("-------------------------------------------------")
+#     print("\nBenchmark Statistics [Post global route metrics]")
+#     print("-------------------------------------------------")
+#     print(f"Design: {design_name}")
+#     print(f"Gate count: {gate_count}")
+#     print("-------------------------------------------------")
 
 
 #this is not the same as openroad helpers it uses the odb to load the design
@@ -46,7 +46,6 @@ def load_design_odb(odb_path, sdc_path, lib_dir, lef_dir):
 #                   .getmterms()                                                                    # returns all pin definitions for this cell type such as output Y and inputs A and B
 #                       dbmterm: defines a pin on the library cell, so generic
 #                           .getname()                                                              # the pin's name 
-#                           .getiotype()                                                            # returns direction of the pin
 #                           .getsigtype()                                                           # returns signal type ("POWER", "GROUND")
 #           .getiterms()                                                                            # returns all pins for this instance, which are the actual pins in the design
 #               dbiterm: a specific pin/terminal of this placed instance, so not generic
@@ -57,7 +56,6 @@ def load_design_odb(odb_path, sdc_path, lib_dir, lef_dir):
 #                   .isoutputsignal()                                                               # returns true if this pin is an output
 #                   .getmterm()                                                                     # returns the dbmterm for this pin (pin's definition on the library cell)
 #           .getbbox()                                                                              # returns instance's bounding box
-#           .getplacementstatus()                                                                   # returns placement status such, i dont know what the return outputs actually look like 
 #
 #   .getnets()                                                                                      # returns all signal nets in the block, which are connections between pins
 #       dbnet: represents a net or wire
@@ -191,10 +189,10 @@ if __name__ == "__main__":
     LEF_PATH = f"../../platform/{args.platform}/lef"
 
     tech, design = load_design_odb(ODB_PATH, SDC_PATH, LIB_PATH, LEF_PATH)
-    print_benchmark_statistics(args.design, design)
+    # print_benchmark_statistics(args.design, design)
     cells, pins, nets = extract_design_data(design)
 
-    write_csv(cells, "cells.csv")
-    write_csv(pins, "pins.csv")
-    write_csv(nets, "nets.csv")
+    write_csv(cells, "../../designs/{args.design}/IR_Tables/cells.csv")
+    write_csv(pins, "../../designs/{args.design}/IR_Tables/pins.csv")
+    write_csv(nets, "../../designs/{args.design}/IR_Tables/nets.csv")
     print("CSV files written: cells.csv, pins.csv, nets.csv")
