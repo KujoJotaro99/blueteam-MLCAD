@@ -73,6 +73,9 @@ def extract_design_data(design):
 
     #gets all cell/macro instances in the design
     for inst in block.getInsts():
+        #othewise csv is too big
+        if inst.getMaster().isFiller():
+            continue
         #get size/position
         bbox = inst.getBBox()
         #cell 
@@ -177,7 +180,7 @@ if __name__ == "__main__":
     tech, design = load_design_odb(ODB_PATH, SDC_PATH, LIB_PATH, LEF_PATH)
     cells, pins, nets = extract_design_data(design)
 
-    write_csv(cells, "../../designs/{args.design}/IR_Tables/cells.csv")
-    write_csv(pins, "../../designs/{args.design}/IR_Tables/pins.csv")
-    write_csv(nets, "../../designs/{args.design}/IR_Tables/nets.csv")
+    write_csv(cells, f"../../designs/{args.design}/IR_Tables/cells.csv")
+    write_csv(pins, f"../../designs/{args.design}/IR_Tables/pins.csv")
+    write_csv(nets, f"../../designs/{args.design}/IR_Tables/nets.csv")
     print("CSV files written: cells.csv, pins.csv, nets.csv")

@@ -1,0 +1,72 @@
+Startpoint: wb_data_i[19] (input port clocked by clk)
+Endpoint: u12_dout_reg[19] (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: min
+
+      Cap      Slew     Delay      Time   Description
+-------------------------------------------------------------------------------
+                       0.0000    0.0000   clock clk (rise edge)
+                       0.0000    0.0000   clock network delay (propagated)
+                       4.0000    4.0000 ^ input external delay
+   0.4691    0.8000    0.0000    4.0000 ^ wb_data_i[19] (in)
+             0.8000    0.0000    4.0000 ^ input31/A (BUFx3_ASAP7_75t_R)
+   0.4528    6.1302   12.1903   16.1903 ^ input31/Y (BUFx3_ASAP7_75t_R)
+             6.1302    0.0000   16.1903 ^ g213180/A (INVx1_ASAP7_75t_R)
+   0.5423    5.8966    5.7978   21.9881 v g213180/Y (INVx1_ASAP7_75t_R)
+             5.8966    0.0000   21.9881 v u12_dout_reg[19]/D (DFFHQNx2_ASAP7_75t_SL)
+                                21.9881   data arrival time
+
+                       0.0000    0.0000   clock clk (rise edge)
+                      91.1019   91.1019   clock network delay (propagated)
+                       0.0000   91.1019   clock reconvergence pessimism
+                                91.1019 ^ u12_dout_reg[19]/CLK (DFFHQNx2_ASAP7_75t_SL)
+                      12.9839  104.0858   library hold time
+                               104.0858   data required time
+-------------------------------------------------------------------------------
+                               104.0858   data required time
+                               -21.9881   data arrival time
+-------------------------------------------------------------------------------
+                               -82.0977   slack (VIOLATED)
+
+
+Startpoint: in_valid_s_reg[0] (rising edge-triggered flip-flop clocked by clk)
+Endpoint: u9_mem_reg[3][8] (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+      Cap      Slew     Delay      Time   Description
+-------------------------------------------------------------------------------
+                       0.0000    0.0000   clock clk (rise edge)
+                      90.8998   90.8998   clock network delay (propagated)
+            22.2468    0.0000   90.8998 ^ in_valid_s_reg[0]/CLK (DFFHQNx1_ASAP7_75t_SL)
+   1.9049   21.9650   38.9520  129.8519 ^ in_valid_s_reg[0]/QN (DFFHQNx1_ASAP7_75t_SL)
+            21.9650    0.0000  129.8519 ^ g183349/B (AND2x2_ASAP7_75t_R)
+   2.6801   17.2321   27.6802  157.5320 ^ g183349/Y (AND2x2_ASAP7_75t_R)
+            17.2321    0.0000  157.5320 ^ g175375/B (AND2x4_ASAP7_75t_R)
+   5.2101   16.9460   25.3832  182.9152 ^ g175375/Y (AND2x4_ASAP7_75t_R)
+            16.9460    0.0000  182.9152 ^ g178199/B (AND3x1_ASAP7_75t_R)
+   4.9843   48.5071   44.4767  227.3919 ^ g178199/Y (AND3x1_ASAP7_75t_R)
+            48.5071    0.0000  227.3919 ^ g195911/A (INVx8_ASAP7_75t_SL)
+   1.0621   12.2943    3.5010  230.8929 v g195911/Y (INVx8_ASAP7_75t_SL)
+            12.2943    0.0000  230.8929 v fanout445/A (BUFx3_ASAP7_75t_R)
+   9.8986   26.4636   29.9273  260.8201 v fanout445/Y (BUFx3_ASAP7_75t_R)
+            26.4636    0.0000  260.8201 v fanout444/A (BUFx3_ASAP7_75t_R)
+   8.4461   23.5673   33.1177  293.9378 v fanout444/Y (BUFx3_ASAP7_75t_R)
+            23.5673    0.0000  293.9378 v g153412__178339/B2 (AOI22xp33_ASAP7_75t_SL)
+   0.6197   24.9941   14.9812  308.9190 ^ g153412__178339/Y (AOI22xp33_ASAP7_75t_SL)
+            24.9941    0.0000  308.9190 ^ u9_mem_reg[3][8]/D (DFFHQNx2_ASAP7_75t_SL)
+                               308.9190   data arrival time
+
+                     120.0000  120.0000   clock clk (rise edge)
+                      76.1358  196.1358   clock network delay (propagated)
+                       5.8996  202.0354   clock reconvergence pessimism
+                               202.0354 ^ u9_mem_reg[3][8]/CLK (DFFHQNx2_ASAP7_75t_SL)
+                      -6.8113  195.2242   library setup time
+                               195.2242   data required time
+-------------------------------------------------------------------------------
+                               195.2242   data required time
+                              -308.9190   data arrival time
+-------------------------------------------------------------------------------
+                              -113.6948   slack (VIOLATED)
+
+

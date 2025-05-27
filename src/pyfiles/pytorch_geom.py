@@ -9,10 +9,11 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--platform", type=str, default="ASAP7", help="Platform name")
     args = parser.parse_args()
 
-#need to turn netlist into a graph
-cells = pd.read_csv("../../designs/{args.design}/IR_Tables/cells.csv")
+#data loading
 #read each cell and save as a node
-nets = pd.read_csv("../../designs/{args.design}/IR_Tables/nets.csv")
+cells = pd.read_csv(f"../../designs/{args.design}/IR_Tables/cells.csv")
 #read each net and save as an edge
-#read node results like cell type and save as feature
+nets = pd.read_csv(f"../../designs/{args.design}/IR_Tables/nets.csv")
+#read each pin and its features
+pins = pd.read_csv(f"../../designs/{args.design}/IR_Tables/pins.csv")
 
