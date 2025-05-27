@@ -29,7 +29,7 @@ with open("Results/timing_report.rpt", "r") as f:
             if line.find("slack") == -1:
                 continue
             slacks.append(float(line[delay_i:time_i]))
-        elif len(line) <= 1:
+        elif len(line) <= 1 and parse:
             # Get rid of the "data arrival time" entry
             paths[-1].pop()
             parse = False
