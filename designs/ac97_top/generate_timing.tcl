@@ -1,9 +1,9 @@
-set lib_dir    "../../../platform/ASAP7/lib"
-set lef_dir    "../../../platform/ASAP7/lef"
-set def_file   "6_final.def"
-set odb_file   "6_final.odb"
-set sdc_file   "6_final.sdc"
-set rpt_file   "timing_report.rpt"
+set lib_dir    "../../platform/ASAP7/lib"
+set lef_dir    "../../platform/ASAP7/lef"
+set def_file   "Results/6_final.def"
+set odb_file   "Results/6_final.odb"
+set sdc_file   "Results/6_final.sdc"
+set rpt_file   "Results/timing_report.rpt"
 
 foreach libfile [glob "$lib_dir/*.lib"] {
     read_liberty $libfile
