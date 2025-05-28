@@ -1,8 +1,9 @@
 # see https://stackoverflow.com/q/62340329
-import sys
+import json
 
 with open("Results/timing_report.rpt", "r") as f:
     paths = []
+    slacks = []
     parse = False
     for line in f:
         if line.startswith("Startpoint"):
@@ -17,9 +18,17 @@ with open("Results/timing_report.rpt", "r") as f:
                 next(f)
             # Find where "Description" is since this is where the pin names
             # start
-            description_i = next(f).index("Description")
+            header = next(f)
+            delay_i = header.index("Delay") + len("Delay")
+            time_i = header.index("Time") + len("Time")
+            description_i = header.index("Description")
             for _ in range(3):
                 next(f)
+        elif line.strip() == ("-" * 79):
+            line = next(f)
+            if line.find("slack") == -1:
+                continue
+            slacks.append(float(line[delay_i:time_i]))
         elif len(line) <= 1:
             # Get rid of the "data arrival time" entry
             paths[-1].pop()
@@ -27,8 +36,6 @@ with open("Results/timing_report.rpt", "r") as f:
         elif parse:
             paths[-1].append(line[description_i:].strip())
 
-if len(sys.argv) != 2:
-    raise RuntimeError("Terminal spam L\n" * 2000)
-with open(sys.argv[1], "w") as f:
-    for path in paths:
-        print(*path, sep=", ", file=f)
+assert len(paths) == len(slacks), "Paths and slacks counts mismatch"
+with open("timing_digest.json", "w") as f:
+    json.dump([{"path": p, "slew": s} for p, s in zip(paths, slacks)], f)
