@@ -23,31 +23,31 @@ def load_design_odb(odb_path, sdc_path, lib_dir, lef_dir):
 # this is what i can understand from the scripts
 
 # dbblock: the top-level design (block), entire chip or module, this is the main thing to load the design
-#   .getinsts()                                                                                     # returns a list of all cell instances (dbinst) placed in this block
+            #   .getinsts()                                                                                     # returns a list of all cell instances (dbinst) placed in this block
 #       dbinst: an occurrence of a cell or macro placed in the design
-#           .getname()                                                                              # returns the unique name of this instance
-#           .getmaster()                                                                            # returns the dbmaster object, which is the cell type (dff)
+            #           .getname()                                                                              # returns the unique name of this instance
+            #           .getmaster()                                                                            # returns the dbmaster object, which is the cell type (dff)
 #               dbmaster: describes the cell type from the standard cell library
-#                   .getname()                                                                      # returns the name of the cell type (such as "nand_something" or "blabla")
-#                   .getmterms()                                                                    # returns all pin definitions for this cell type such as output Y and inputs A and B
+            #                   .getname()                                                                      # returns the name of the cell type (such as "nand_something" or "blabla")
+            #                   .getmterms()                                                                    # returns all pin definitions for this cell type such as output Y and inputs A and B
 #                       dbmterm: defines a pin on the library cell, so generic
-#                           .getname()                                                              # the pin's name 
-#                           .getsigtype()                                                           # returns signal type ("POWER", "GROUND")
-#           .getiterms()                                                                            # returns all pins for this instance, which are the actual pins in the design
+            #                           .getname()                                                              # the pin's name 
+            #                           .getsigtype()                                                           # returns signal type ("POWER", "GROUND")
+            #           .getiterms()                                                                            # returns all pins for this instance, which are the actual pins in the design
 #               dbiterm: a specific pin/terminal of this placed instance, so not generic
-#                   .getname()                                                                      # pin name on this instance
-#                   .getinst()                                                                      # the parent dbinst (the instance this pin belongs to)
-#                   .getnet()                                                                       # the net this pin is connected
-#                   .isinputsignal()                                                                # returns true if this pin is an input
-#                   .isoutputsignal()                                                               # returns true if this pin is an output
-#                   .getmterm()                                                                     # returns the dbmterm for this pin (pin's definition on the library cell)
-#           .getbbox()                                                                              # returns instance's bounding box
+            #                   .getname()                                                                      # pin name on this instance
+            #                   .getinst()                                                                      # the parent dbinst (the instance this pin belongs to)
+            #                   .getnet()                                                                       # the net this pin is connected
+            #                   .isinputsignal()                                                                # returns true if this pin is an input
+            #                   .isoutputsignal()                                                               # returns true if this pin is an output
+            #                   .getmterm()                                                                     # returns the dbmterm for this pin (pin's definition on the library cell)
+            #           .getbbox()                                                                              # returns instance's bounding box
 #
-#   .getnets()                                                                                      # returns all signal nets in the block, which are connections between pins
+            #   .getnets()                                                                                      # returns all signal nets in the block, which are connections between pins
 #       dbnet: represents a net or wire
-#           .getname()                                                                              # net's name
-#           .getiterms()                                                                            # returns all instances of pins attached to this net
-#           .getsigtype()                                                                           # returns net type ("POWER", "GROUND")
+            #           .getname()                                                                              # net's name
+            #           .getiterms()                                                                            # returns all instances of pins attached to this net
+            #           .getsigtype()                                                                           # returns net type ("POWER", "GROUND")
 #
 #
 #
