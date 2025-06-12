@@ -117,29 +117,6 @@ def subgraph_to_pygdata(sg, feature_map, net_features):
         edge_attr = torch.empty((0, 1), dtype=torch.float)
     return Data(x=x, edge_index=edge_index, edge_attr=edge_attr)
 
-# def sample_random_subgraph(G, min_size=4, max_size=12):
-#     #gets all nodes in g as index in list
-#     nodes_list = list(G.nodes)
-#     if len(nodes_list) < min_size:
-#         return None
-#     #chooses a random node as rthe starting point
-#     start = random.choice(nodes_list)
-
-#     sub_nodes = set([start])
-#     # Simple expansion (BFS or random walk)
-#     frontier = set(G.successors(start)).union(set(G.predecessors(start)))
-#     while len(sub_nodes) < max_size and frontier:
-#         nxt = random.choice(list(frontier))
-#         sub_nodes.add(nxt)
-#         new_front = set(G.successors(nxt)).union(set(G.predecessors(nxt)))
-#         frontier = (frontier | new_front) - sub_nodes
-#     # Guarantee minimum size
-#     if len(sub_nodes) < min_size:
-#         extra = set(random.sample(nodes_list, min_size - len(sub_nodes)))
-#         sub_nodes.update(extra)
-#     sg = G.subgraph(sub_nodes).copy()
-#     return sg
-
 def sample_random_subgraph(G, min_size=4, max_size=12):
     total = G.number_of_nodes()
     if total < min_size:
