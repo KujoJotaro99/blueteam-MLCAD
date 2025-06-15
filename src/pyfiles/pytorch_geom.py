@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import torch
 import json
@@ -157,7 +158,7 @@ def sample_random_subgraph(G, min_size=4, max_size=12):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Sample subgraphs with features for GNN training")
     parser.add_argument("-d", "--design", type=str, default="ac97_top", help="Design name")
-    parser.add_argument("-n", "--num_subgraphs", type=int, default=10, help="How many subgraphs to sample")
+    parser.add_argument("-n", "--num_subgraphs", type=int, default=1000, help="How many subgraphs to sample")
     args = parser.parse_args()
 
     #load everything
@@ -179,11 +180,17 @@ if __name__ == "__main__":
         pyg_samples.append(pyg_data)
 
         #graphic
-        G_nx = to_networkx(pyg_data, to_undirected=True)
-        plt.figure(figsize=(4,3))
-        nx.draw(G_nx, with_labels=True)
-        plt.show()
+        # G_nx = to_networkx(pyg_data, to_undirected=True)
+        # plt.figure(figsize=(4,3))
+        # nx.draw(G_nx, with_labels=True)
+        # plt.show()
 
         print(f"Subgraph {i}: nodes={pyg_data.num_nodes}, edges={pyg_data.num_edges}, label={label}")
 
+    #save directory
+    save_dir = f"../../designs/{args.design}/subgraphs"
+    os.makedirs(save_dir, exist_ok=True)
+    for i, pyg_data in enumerate(pyg_samples):
+        torch.save(pyg_data, f"{save_dir}/subgraph_{i}.pt")
+    print(f"saved {len(pyg_samples)} subgraphs in {save_dir}/")
     print(f"Total subgraphs sampled: {len(pyg_samples)}")
