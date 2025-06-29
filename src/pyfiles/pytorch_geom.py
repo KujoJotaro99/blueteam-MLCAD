@@ -119,46 +119,50 @@ def subgraph_to_pygdata(sg, feature_map, net_features):
     return Data(x=x, edge_index=edge_index, edge_attr=edge_attr)
 
 #get a small subgraph of main design graph
-def sample_random_subgraph(G, min_size=4, max_size=12):
+def sample_random_subgraph(G, pins, min_size=4, max_size=12, critical=False, threshold=0, max_attempts=10):
     total = G.number_of_nodes()
     if total < min_size:
         return None
 
-    #random target size between min and max(either maximum of existing nodes or just max size)
-    target = random.randint(min_size, min(max_size, total))
+    for _ in range(max_attempts):
+        #determine seed node
+        if critical:
+            #find cells with slack<threshold
+            slack_map = pins.groupby('cell_name')['slack'].min()
+            viol_cells = [c for c, s in slack_map.items() if s < threshold]
+            if not viol_cells:
+                return None
+            seed = random.choice(viol_cells)
+        else:
+            #random starting node
+            seed = random.choice(list(G.nodes()))
 
-    #random starting node
-    seed = random.choice(list(G.nodes()))
-    #BFS visited dict
-    visited = {seed}
-    #fifo
-    queue = deque()
-    queue.append(seed) 
-
-    #bfs loop
-    while queue and len(visited) < target:
-        u = queue.popleft()
-        #get neighbours
-        nbrs = list(G.successors(u)) + list(G.predecessors(u))
-        #shuffle neigbours because the successors and predecssors are ordered
-        random.shuffle(nbrs)
-        #for every node in neighbours
-        for v in nbrs:
-            #if its not visited
-            if v not in visited:
-                #add to dict and queue
-                visited.add(v)
-                queue.append(v)
-                #if the size exceeded end
-                if len(visited) >= target:
-                    break
-
-    return G.subgraph(visited).copy()
+        #bfs to collect nodes
+        visited = {seed}
+        queue = deque([seed])
+        target = random.randint(min_size, min(max_size, total))
+        while queue and len(visited) < target:
+            u = queue.popleft()
+            nbrs = list(G.successors(u)) + list(G.predecessors(u))
+            random.shuffle(nbrs)
+            for v in nbrs:
+                if v not in visited:
+                    visited.add(v)
+                    queue.append(v)
+                    if len(visited) >= target:
+                        break
+        subG = G.subgraph(visited).copy()
+        #check violation status
+        label = label_violation(subG, pins, threshold)
+        if (critical and label == 1) or (not critical and label == 0):
+            return subG
+    return None
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Sample subgraphs with features for GNN training")
     parser.add_argument("-d", "--design", type=str, default="ac97_top", help="Design name")
-    parser.add_argument("-n", "--num_subgraphs", type=int, default=1000, help="How many subgraphs to sample")
+    parser.add_argument("-n", "--num_subgraphs", type=int, default=100, help="How many subgraphs to sample")
+    parser.add_argument("-c", "--critical_ratio", type=float, default=0.5, help="fraction of critical subgraphs")
     args = parser.parse_args()
 
     #load everything
@@ -171,7 +175,10 @@ if __name__ == "__main__":
     #sample subgraphs, get PyG data and label
     pyg_samples = []
     for i in range(args.num_subgraphs):
-        sg = sample_random_subgraph(G, min_size=4, max_size=12)
+        if random.random() < args.critical_ratio:
+            sg = sample_random_subgraph(G, pins, min_size=4, max_size=12, critical=True)
+        else:
+            sg = sample_random_subgraph(G, pins, min_size=4, max_size=12, critical=False)
         if sg is None:
             continue
         label = label_violation(sg, pins)  # 1 if violated, 0 otherwise

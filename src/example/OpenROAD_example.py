@@ -22,7 +22,7 @@ args = parser.parse_args()
 #
 # -----------------------------------------------------
 
-# Load the design using OpenROAD Python APIs
+# Load the design u sing OpenROAD Python APIs
 tech, design = load_design(args.d, True)
 timing = Timing(design)
 db = ord.get_db()

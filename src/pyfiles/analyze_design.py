@@ -4,23 +4,7 @@ from openroad import Tech, Design, Timing
 import openroad as ord
 import csv
 
-#this is not the same as openroad helpers it uses the odb to load the design
-def load_design_odb(odb_path, sdc_path, lib_dir, lef_dir):
-    tech = Tech()
-    for lib_file in Path(lib_dir).glob("*.lib"):
-        tech.readLiberty(str(lib_file))
-    for tech_lef_file in Path(lef_dir).glob("*tech*.lef"):
-        tech.readLef(str(tech_lef_file))
-    for lef_file in Path(lef_dir).glob("*.lef"):
-        if "tech" not in str(lef_file):
-            tech.readLef(str(lef_file))
-    design = Design(tech)
-    design.evalTclString(f"read_db {odb_path}")
-    design.evalTclString(f"read_sdc {sdc_path}")
-    return tech, design
-
-# not fully confident if this is what every function does, tried to follow openroad helpers
-# this is what i can understand from the scripts
+# known documentation
 
 # dbblock: the top-level design (block), entire chip or module, this is the main thing to load the design
             #   .getinsts()                                                                                     # returns a list of all cell instances (dbinst) placed in this block
@@ -52,18 +36,27 @@ def load_design_odb(odb_path, sdc_path, lib_dir, lef_dir):
 #
 #
 #
-# what openroad helpers uses(not 100% sure):
-#   - get cell coordinates:           inst.getbbox().xmin(), inst.getbbox().ymin()
-#   - get instance type:              inst.getmaster().getname()
-#   - determine pin direction:        pin.isinputsignal(), pin.isoutputsignal()
-#   - find the net for a pin:         pin.getnet().getname()
+
+def load_design_odb(odb_path, sdc_path, lib_dir, lef_dir):
+    tech = Tech()
+    for lib_file in Path(lib_dir).glob("*.lib"):
+        tech.readLiberty(str(lib_file))
+    for tech_lef_file in Path(lef_dir).glob("*tech*.lef"):
+        tech.readLef(str(tech_lef_file))
+    for lef_file in Path(lef_dir).glob("*.lef"):
+        if "tech" not in str(lef_file):
+            tech.readLef(str(lef_file))
+    design = Design(tech)
+    design.evalTclString(f"read_db {odb_path}")
+    design.evalTclString(f"read_sdc {sdc_path}")
+    return tech, design
 
 def extract_design_data(design):
     block = ord.get_db_block()
     timing = Timing(design)
     cells, pins, nets = [], [], []
 
-    #get start and endpoints, im pretty sure this doesnt work since openroad helpers used a tcl macro and also the outputted csv file is always 0 for all pins
+    #get start and endpoints
     try:
         startpoints = set(sp.getName() for sp in timing.startpoints())
         endpoints = set(ep.getName() for ep in timing.endpoints())
