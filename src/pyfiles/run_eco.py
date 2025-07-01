@@ -62,16 +62,19 @@ def apply_eco(design_name: str = "ac97_top", tech_name: str = "ASAP7"):
                 if count > maxf:
                     best_net, maxf = n, count
 
-        #if the fanout is too large then just insert a buffer
-        if maxf > 8:
-            inst = insert_buffer(design, best_net)
-            print(f"Inserted buffer {inst} on net {best_net} (fanout {maxf})")
-        #otherwise default for now is just increasing drive 
-        else:
-            last_hop = [h for h in entry.get("path", []) if "(" in h][-1]
-            inst_name = last_hop.split()[0].split("/")[0]
-            newm = gate_sizing(design, inst_name, direction=True)
-            print(f"Upsized {inst_name} → {newm} (slack {slack})")
+        inst = insert_buffer(design, best_net)
+        print(f"Inserted buffer {inst} on net {best_net} (fanout {maxf})")
+
+        # #if the fanout is too large then just insert a buffer
+        # if maxf > 8:
+        #     inst = insert_buffer(design, best_net)
+        #     print(f"Inserted buffer {inst} on net {best_net} (fanout {maxf})")
+        # #otherwise default for now is just increasing drive 
+        # else:
+        #     last_hop = [h for h in entry.get("path", []) if "(" in h][-1]
+        #     inst_name = last_hop.split()[0].split("/")[0]
+        #     newm = gate_sizing(design, inst_name, direction=True)
+        #     print(f"Upsized {inst_name} → {newm} (slack {slack})")
 
         design.evalTclString("update_timing -incremental")
 
