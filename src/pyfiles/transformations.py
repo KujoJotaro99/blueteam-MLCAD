@@ -15,7 +15,7 @@ def _read_cell_liberty(tech_node="ASAP7"):
         return _LIB_CACHE[tech_node]
     lib_dir = Path(f"../../platform/{tech_node}/lib/")
     lib_files = lib_dir.glob("*.lib")
-    lib_parsed_list = [parse_liberty(str(lib_file)) for lib_file in lib_files]
+    lib_parsed_list = [parse_liberty(open(lib_file).read()) for lib_file in lib_files]
     _LIB_CACHE[tech_node] = lib_parsed_list
     return lib_parsed_list
 
@@ -78,6 +78,8 @@ def _get_equiv_cells(design, inst_name):
     timing.makeEquivCells()
     block = ord.get_db_block()
     inst = block.findInst(inst_name)
+    if inst is None:
+        return []
     master = inst.getMaster()
     #return list of dbMaster objects
     return timing.equivCells(master)
@@ -95,8 +97,10 @@ def gate_sizing(design, inst_name, direction=True, tech = "ASAP7", voltage=0.7):
     # get current instance's drive strength
     block = ord.get_db_block()
     inst = block.findInst(inst_name)
+    if inst is None:
+        return inst_name
     inst_master = inst.getMaster()
-    inst_drive = _get_drive_strength(parsed_libs, inst_master, voltage)
+    inst_drive = master_drive.get(inst_master)
     # compare with other cells
     for m, drive in sorted_m:
         if drive is None or m == inst_master:
@@ -108,7 +112,3 @@ def gate_sizing(design, inst_name, direction=True, tech = "ASAP7", voltage=0.7):
     # if cannot go lower or higher
     return inst_master.getName()
         
-# buffer placement
-def buffer_placement():
-    return
-
