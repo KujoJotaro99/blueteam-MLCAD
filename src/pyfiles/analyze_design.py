@@ -63,7 +63,17 @@ def extract_design_data(design):
     except Exception:
         startpoints = set()
         endpoints = set()
-
+    # get input pin count
+    master = inst.getMaster()
+    #get area
+    area = master.getArea()
+    # get terminals of master
+    input_pins = [mt for mt in master.getMTerms() if mt.getSigType() == "INPUT"]
+    input_count = len(input_pins)
+    # check cell type 
+    cell_type = master.getName()
+    is_flop = int("DFF" in cell_type)
+    is_latch = int("DHL" in cell_type)
     #gets all cell/macro instances in the design
     for inst in block.getInsts():
         #othewise csv is too big
@@ -79,7 +89,48 @@ def extract_design_data(design):
             #find size
             "x": bbox.xMin(),
             "y": bbox.yMin(),
+            "input_count": input_count,
+            "is_flop": is_flop,
+            "is_latch": is_latch,
+            "area": area,
+            "fanout": cell_fanout.get(inst.getName(), 0)
         })
+        cell_fanout = {}
+        #traverse the nets
+        for net in block.getNets():
+            #get all pins that are inputs atached to this net
+            sinks = [p.getName() for p in net.getITerms() if p.isInputSignal()]
+            #get all pins that are outputs atached to this net
+            driver = [p.getName() for p in net.getITerms() if p.isOutputSignal()]
+            # get pin coordinates for all pins on this net
+            xs, ys = [], []
+            for pin in net.getITerms():
+                inst = pin.getInst()
+                bbox = inst.getBBox()
+                xs.append(bbox.xMin())
+                ys.append(bbox.yMin())
+            if xs and ys:
+                # half perimeter wirelength calculation, may be simplest for gnn applciation to predict high cap and necessary for buffer placement
+                hpwl = (max(xs) - min(xs)) + (max(ys) - min(ys))
+            else:
+                hpwl = 0
+            # get net capacitance 
+            try:
+                net_cap = timing.getNetCap(net)
+            except Exception:
+                net_cap = None
+            # fanout 
+            if driver:
+                # driver[0] is something like U123/Y
+                driver_cell = driver[0].split('/')[0]
+                cell_fanout[driver_cell] = cell_fanout.get(driver_cell, 0) + len(sinks)
+            nets.append({
+                "net_name": net.getName(),
+                "driver_pin": driver[0] if driver else None,
+                "sink_pins": sinks,
+                "fanout": len(sinks),
+                "hpwl": hpwl
+            })
         #traverses pin instances for EACH cell.macro in the design
         for pin in inst.getITerms():
             #get net
@@ -117,8 +168,8 @@ def extract_design_data(design):
                 arr_r = arr_f = None
             #add to pin object
             pin_full = f"{inst.getName()}/{pin.getName()}"
-            is_endpoint = int(pin_full in endpoints or inst.getName() in endpoints)
-            is_startpoint = int(pin_full in startpoints or inst.getName() in startpoints)
+            # is_endpoint = int(pin_full in endpoints or inst.getName() in endpoints)
+            # is_startpoint = int(pin_full in startpoints or inst.getName() in startpoints)
             pins.append({
                 "pin_name": pin.getName(),
                 "cell_name": inst.getName(),
@@ -135,18 +186,6 @@ def extract_design_data(design):
                 #"is_endpoint": is_endpoint, #removed since im pretty sure the method of collectin gthis is wrong
                 #"is_startpoint": is_startpoint,
             })
-    #traverse the nets
-    for net in block.getNets():
-        #get all pins that are inputs atached to this net
-        sinks = [p.getName() for p in net.getITerms() if p.isInputSignal()]
-        #get all pins that are outputs atached to this net
-        driver = [p.getName() for p in net.getITerms() if p.isOutputSignal()]
-        nets.append({
-            "net_name": net.getName(),
-            "driver_pin": driver[0] if driver else None,
-            "sink_pins": sinks,
-            "fanout": len(sinks)
-        })
     return cells, pins, nets
 
 #dump everything into csv

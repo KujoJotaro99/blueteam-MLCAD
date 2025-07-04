@@ -67,7 +67,12 @@ def build_feature_maps(cells, pins, nets):
             row['cell_type_id'], row['x'], row['y'],
             float(min_slack.get(name, 0)),
             float(max_cap.get(name, 0)),
-            float(max_max_cap.get(name, 0))
+            float(max_max_cap.get(name, 0)),
+            float(row['fanout']) if 'fanout' in row and not pd.isnull(row['fanout']) else 0.0,
+            float(row['area']),
+            int(row['is_flop']),
+            int(row['is_latch']),
+            int(row['input_count'])
         ]
         feature_map[name] = feature_vector
     #net features, converts entire row as a feature
@@ -98,8 +103,10 @@ def subgraph_to_pygdata(sg, feature_map, net_features):
     for src, tgt, data in sg.edges(data=True):
         edge_index.append([node_map[src], node_map[tgt]])
         net_name = data.get('net_name', None)
+        hpwl = net_features[net_name]['hpwl'] if net_name in net_features else 0
+        net_cap = net_features[net_name]['net_cap'] if net_name in net_features else 0
         fanout = net_features[net_name]['fanout'] if net_name in net_features else 0
-        edge_attr.append([float(fanout)])
+        edge_attr.append([float(fanout), float(hpwl), float(net_cap)])
     #if the graph has edges
     if edge_index:
         #.t transposes from row column to column row
