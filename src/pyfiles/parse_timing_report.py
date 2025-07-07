@@ -6,7 +6,7 @@ parser = argparse.ArgumentParser(description="Parse timing report")
 parser.add_argument("-d", "--design", type=str, default="ac97_top", help="Design name")
 args = parser.parse_args()
 
-with open(f"../../designs/{args.design}/Results/timing_report.rpt", "r") as f:
+with open(f"../../designs/{args.design}/Results/Run1/timing_report.rpt", "r") as f:
     paths = []
     slacks = []
     parse = False
@@ -42,5 +42,5 @@ with open(f"../../designs/{args.design}/Results/timing_report.rpt", "r") as f:
             paths[-1].append(line[description_i:].strip())
 
 assert len(paths) == len(slacks), "Paths and slacks counts mismatch"
-with open(f"../../designs/{args.design}/Results/timing_digest.json", "w") as f:
-    json.dump([{"path": p, "slew": s} for p, s in zip(paths, slacks)], f)
+with open(f"../../designs/{args.design}/Results/Run1/timing_digest.json", "w") as f:
+    json.dump([{"path": p, "slack": s} for p, s in zip(paths, slacks)], f)
